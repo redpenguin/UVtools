@@ -4,7 +4,7 @@
 # Requirements:
 ## git
 ## cmake
-## Visual Studio with development tools and sdk
+## Visual Studio with development tools and Windows SDK
 
 # Script working directory
 #Set-Location $PSScriptRoot

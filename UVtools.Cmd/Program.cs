@@ -55,6 +55,8 @@ internal class Program
             PrintMachinesCommand.CreateCommand(),
             PrintFormatsCommand.CreateCommand(),
 
+            BenchmarkLayerCodecsCommand.CreateCommand(),
+
             GlobalOptions.QuietOption,
             GlobalOptions.NoProgressOption,
             GlobalOptions.DummyOption,

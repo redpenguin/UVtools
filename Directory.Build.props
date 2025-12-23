@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <!-- Project -->
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Platforms>AnyCPU;x64;ARM64</Platforms>
         <Nullable>enable</Nullable>
 
@@ -38,8 +38,8 @@
         <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 
         <!-- Versions -->
-        <UVtoolsVersion>5.2.1</UVtoolsVersion>
-        <AvaloniaVersion>11.3.6</AvaloniaVersion>
+        <UVtoolsVersion>5.3.0</UVtoolsVersion>
+        <AvaloniaVersion>11.3.10</AvaloniaVersion>
 
         <!-- MvvmToolkit -->
         <MvvmToolkitEnableINotifyPropertyChangingSupport>false</MvvmToolkitEnableINotifyPropertyChangingSupport>

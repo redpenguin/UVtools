@@ -20,7 +20,7 @@ public class KernelCacheManager : IDisposable
 
     public bool UseDynamicKernel { get; set; }
 
-    public ElementShape DynamicKernelShape { get; set; } = ElementShape.Ellipse;
+    public MorphShapes DynamicKernelShape { get; set; } = MorphShapes.Ellipse;
 
     private readonly Mat _defaultKernel;
 

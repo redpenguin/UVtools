@@ -61,7 +61,7 @@ public partial class ToolPCBExposureControl : ToolControl
 
         AddHandler(DragDrop.DropEvent, (sender, args) =>
         {
-            var files = args.Data.GetFiles();
+            var files = args.DataTransfer.TryGetFiles();
             if (files is null) return;
             Operation.AddFiles(files.AsValueEnumerable().Select(file => file.TryGetLocalPath()).ToArray()!);
         });

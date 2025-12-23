@@ -25,7 +25,7 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
     #region Members
     private bool _useDynamicKernel;
     private readonly KernelCacheManager _kernelCache = new();
-    private ElementShape _kernelShape = ElementShape.Rectangle;
+    private MorphShapes _kernelShape = MorphShapes.Rectangle;
     private uint _matrixWidth = 3;
     private uint _matrixHeight = 3;
     private string _matrixText = "1 1 1\n1 1 1\n1 1 1";
@@ -33,7 +33,7 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
     private int _anchorY = -1;
     private Mat? _kernelMat;
     private readonly Lock _mutex = new();
-    private ElementShape _dynamicKernelShape = ElementShape.Ellipse;
+    private MorphShapes _dynamicKernelShape = MorphShapes.Ellipse;
 
     #endregion
 
@@ -48,7 +48,7 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
         }
     }
 
-    public ElementShape DynamicKernelShape
+    public MorphShapes DynamicKernelShape
     {
         get => _dynamicKernelShape;
         set
@@ -107,7 +107,7 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
                     }
                     else
                     {
-                        SetKernel(ElementShape.Rectangle);
+                        SetKernel(MorphShapes.Rectangle);
                     }
                 }
             }
@@ -117,13 +117,13 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
         set => _kernelMat = value;
     }
 
-    public ElementShape KernelShape
+    public MorphShapes KernelShape
     {
         get => _kernelShape;
         set => RaiseAndSetIfChanged(ref _kernelShape, value);
     }
 
-    public IEnumerable<ElementShape> KernelShapes => ((ElementShape[])Enum.GetValues(typeof(ElementShape))).Where(element => element != ElementShape.Custom);
+    public IEnumerable<MorphShapes> KernelShapes => ((MorphShapes[])Enum.GetValues(typeof(MorphShapes))).Where(element => element != MorphShapes.Custom);
 
     public Point Anchor
     {
@@ -143,7 +143,7 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
     #region Methods
     public void ResetKernel()
     {
-        KernelShape = ElementShape.Rectangle;
+        KernelShape = MorphShapes.Rectangle;
         MatrixWidth = 3;
         MatrixHeight = 3;
         AnchorX = -1;
@@ -225,13 +225,13 @@ public sealed class KernelConfiguration : BindableBase, IDisposable
     }
 
 
-    public void SetKernel(ElementShape shape, Size size, Point anchor)
+    public void SetKernel(MorphShapes shape, Size size, Point anchor)
     {
         KernelMat = CvInvoke.GetStructuringElement(shape, size, anchor);
     }
 
-    public void SetKernel(ElementShape shape, Size size) => SetKernel(shape, size, EmguExtensions.AnchorCenter);
-    public void SetKernel(ElementShape shape) => SetKernel(shape, new Size(3, 3), EmguExtensions.AnchorCenter);
+    public void SetKernel(MorphShapes shape, Size size) => SetKernel(shape, size, EmguExtensions.AnchorCenter);
+    public void SetKernel(MorphShapes shape) => SetKernel(shape, new Size(3, 3), EmguExtensions.AnchorCenter);
 
     public Mat? GetKernel()
     {

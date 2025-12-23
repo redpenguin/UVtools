@@ -233,7 +233,7 @@ public sealed class IssueManager : RangeObservableCollection<MainIssue>
             var firstLayer = SlicerFile.FirstLayer;
 
             int overhangsIterations = overhangConfig.ErodeIterations;
-            using var overhangsKernel = EmguExtensions.GetDynamicKernel(ref overhangsIterations, ElementShape.Cross);
+            using var overhangsKernel = EmguExtensions.GetDynamicKernel(ref overhangsIterations, MorphShapes.Cross);
 
             // Detect contours
             Parallel.For(0, SlicerFile.LayerCount, CoreSettings.ParallelOptions, layerIndexInt =>

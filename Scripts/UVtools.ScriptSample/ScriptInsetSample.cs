@@ -67,7 +67,7 @@ public class ScriptInsetSample : ScriptGlobals
     public string? ScriptValidate()
     {
         StringBuilder sb = new();
-            
+
         if (InsetMarginFromEdge.Value < InsetMarginFromEdge.Minimum)
         {
             sb.AppendLine($"Inset edge margin must be at least {InsetMarginFromEdge.Minimum}{InsetMarginFromEdge.Unit}");
@@ -76,7 +76,7 @@ public class ScriptInsetSample : ScriptGlobals
         {
             sb.AppendLine($"Inset thickness must be at least {InsetThickness.Minimum}{InsetThickness.Unit}");
         }
-            
+
         return sb.ToString();
     }
 
@@ -87,10 +87,10 @@ public class ScriptInsetSample : ScriptGlobals
     public bool ScriptExecute()
     {
         var kernel =
-            CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(3, 3), EmguExtensions.AnchorCenter); // Rectangle 3x3 kernel
+            CvInvoke.GetStructuringElement(MorphShapes.Rectangle, new Size(3, 3), EmguExtensions.AnchorCenter); // Rectangle 3x3 kernel
         Progress.Reset("Inset layers", Operation.LayerRangeCount); // Sets the progress name and number of items to process
 
-            
+
         // Loop user selected layers in parallel, this will put each core of CPU working here on parallel
         Parallel.For(Operation.LayerIndexStart, Operation.LayerIndexEnd+1, CoreSettings.GetParallelOptions(Progress), layerIndex =>
         {

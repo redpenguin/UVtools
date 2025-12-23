@@ -79,7 +79,7 @@
 
                             <StackPanel Spacing="10">
                                 <Grid ColumnDefinitions="Auto,10,180,5,Auto,10,Auto,2,Auto,2,Auto,2,Auto,2,Auto,2,Auto,2,Auto"
-                                      RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                                       RowSpacing="10">
                                     <TextBlock Grid.Row="0"
                                                Grid.Column="0"
@@ -240,10 +240,24 @@
                                     <TextBlock Grid.Row="4"
                                                Grid.Column="0"
                                                VerticalAlignment="Center"
+                                               Text="Layer compression level:"
+                                               ToolTip.Tip="Sets the compression level used to compress the layer image. &#x0a;The selected method will impact RAM usage and operations speed." />
+
+                                    <ComboBox Grid.Row="4"
+                                              Grid.Column="2"
+                                              Grid.ColumnSpan="17"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"
+                                              ItemsSource="{Binding Settings.General.LayerCompressionLevel, Converter={StaticResource EnumToCollectionConverter}, Mode=OneTime}"
+                                              SelectedItem="{Binding Settings.General.LayerCompressionLevel, Converter={StaticResource FromValueDescriptionToEnumConverter}}" />
+
+                                    <TextBlock Grid.Row="5"
+                                               Grid.Column="0"
+                                               VerticalAlignment="Center"
                                                Text="Average resin bottle cost:"
                                                ToolTip.Tip="The average cost per one resin bottle of 1000ml. &#x0a;Used to calculate the material cost when the file lacks that information. &#x0a;Use 0 to disable this feature and only show the cost if file have that information. &#x0a;If this value is changed, you need to reload the current file to update the cost." />
 
-                                    <NumericUpDown Grid.Row="4"
+                                    <NumericUpDown Grid.Row="5"
                                                    Grid.Column="2"
                                                    VerticalAlignment="Center"
                                                    Classes="ValueLabel ValueLabel_euro"
@@ -252,7 +266,7 @@
                                                    Minimum="0"
                                                    ToolTip.Tip="The average cost per one resin bottle of 1000ml. &#x0a;Used to calculate the material cost when the file lacks that information. &#x0a;Use 0 to disable this feature and only show the cost if file have that information. &#x0a;If this value is changed, you need to reload the current file to update the cost."
                                                    Value="{Binding Settings.General.AverageResin1000MlBottleCost}" />
-                                    <TextBlock Grid.Row="4"
+                                    <TextBlock Grid.Row="5"
                                                Grid.Column="4"
                                                Grid.ColumnSpan="15"
                                                VerticalAlignment="Center"

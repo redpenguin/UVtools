@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32228.430
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "UVtools.Installer", "UVtools.Installer\UVtools.Installer.wixproj", "{41224896-08E9-4F22-9E56-5F9D46DEC7D2}"
 EndProject

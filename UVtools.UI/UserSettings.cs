@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Xml.Serialization;
 using UVtools.Core;
 using UVtools.Core.Extensions;
@@ -53,6 +54,7 @@ public sealed class UserSettings : BindableBase
         private bool _availableRamOnHitLimitKillIfUnableToAction;
         private int _maxDegreeOfParallelism = -2;
         private LayerCompressionCodec _layerCompressionCodec = CoreSettings.DefaultLayerCompressionCodec;
+        private LayerCompressionLevel _layerCompressionLevel = CoreSettings.DefaultLayerCompressionLevel;
         private float _averageResin1000MlBottleCost = CoreSettings.AverageResin1000MlBottleCost;
         private bool _windowsCanResize;
         private bool _windowsTakeIntoAccountScreenScaling = true;
@@ -172,6 +174,12 @@ public sealed class UserSettings : BindableBase
         {
             get => _layerCompressionCodec;
             set => RaiseAndSetIfChanged(ref _layerCompressionCodec, value);
+        }
+
+        public LayerCompressionLevel LayerCompressionLevel
+        {
+            get => _layerCompressionLevel;
+            set => RaiseAndSetIfChanged(ref _layerCompressionLevel, value);
         }
 
         public float AverageResin1000MlBottleCost
@@ -1934,6 +1942,7 @@ public sealed class UserSettings : BindableBase
 
             CoreSettings.MaxDegreeOfParallelism = _instance.General.MaxDegreeOfParallelism;
             CoreSettings.DefaultLayerCompressionCodec = _instance.General.LayerCompressionCodec;
+            CoreSettings.DefaultLayerCompressionLevel = _instance.General.LayerCompressionLevel;
             CoreSettings.AverageResin1000MlBottleCost = _instance.General.AverageResin1000MlBottleCost;
             CoreSettings.PerLayerSettingsMode = _instance.FileFormats.PerLayerSettingsMode;
 
@@ -2225,6 +2234,7 @@ public sealed class UserSettings : BindableBase
         _instance!.ModifiedDateTime = DateTime.Now;
         CoreSettings.MaxDegreeOfParallelism = _instance.General.MaxDegreeOfParallelism;
         CoreSettings.DefaultLayerCompressionCodec = _instance.General.LayerCompressionCodec;
+        CoreSettings.DefaultLayerCompressionLevel = _instance.General.LayerCompressionLevel;
         CoreSettings.AverageResin1000MlBottleCost = _instance.General.AverageResin1000MlBottleCost;
         CoreSettings.PerLayerSettingsMode = _instance.FileFormats.PerLayerSettingsMode;
         try

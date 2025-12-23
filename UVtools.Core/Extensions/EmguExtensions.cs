@@ -41,7 +41,7 @@ public static class EmguExtensions
     //public static readonly MCvScalar TransparentColor = new();
 
     public static readonly Point AnchorCenter = new(-1, -1);
-    public static readonly Mat Kernel3x3Rectangle = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(3, 3), AnchorCenter);
+    public static readonly Mat Kernel3x3Rectangle = CvInvoke.GetStructuringElement(MorphShapes.Rectangle, new Size(3, 3), AnchorCenter);
 
     /// <summary>
     /// Gets the scale relation for 0-255 byte value.<br/>
@@ -198,7 +198,7 @@ public static class EmguExtensions
     /// <returns></returns>
     public static unsafe byte* GetBytePointer(this Mat mat)
     {
-        return (byte*)mat.DataPointer.ToPointer();    
+        return (byte*)mat.DataPointer.ToPointer();
     }
 
     /// <summary>
@@ -402,7 +402,7 @@ public static class EmguExtensions
 
         if (offset < 0)
             throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset must be a positive value.");
-        
+
         var maxLength = mat.GetLength() / Marshal.SizeOf<T>() - offset;
 
         if (maxLength < 0)
@@ -715,7 +715,7 @@ public static class EmguExtensions
     /// <returns></returns>
     public static byte[] GetPngByes(this IInputArray mat)
     {
-        return CvInvoke.Imencode(".png", mat);
+        return CvInvoke.Imencode(".png", mat, new KeyValuePair<ImwriteFlags, int>(ImwriteFlags.PngCompression, CoreSettings.LayerCompressionPngLevel));
     }
 
     public static Point GetCenterPoint(this Mat mat) => new(mat.Width / 2, mat.Height / 2);
@@ -743,7 +743,7 @@ public static class EmguExtensions
         if (rect.Size == Size.Empty) return src.New();
         if (src.Size == rect.Size) return cloneInsteadRoi ? src.Roi(src.Size) : src.Clone();
         var roi = src.Roi(rect);
-        
+
         if (cloneInsteadRoi)
         {
             var clone = roi.Clone();
@@ -764,7 +764,7 @@ public static class EmguExtensions
 
         var numberOfChannels = roi.NumberOfChannels;
         var cropped = InitMat(new Size(roi.Width + margin.Width * 2, roi.Height + margin.Height * 2), numberOfChannels, roi.Depth);
-        
+
         using var dest = new Mat(cropped, new Rectangle(margin.Width, margin.Height, roi.Width, roi.Height));
         roi.CopyTo(dest);
 
@@ -856,7 +856,7 @@ public static class EmguExtensions
             src.CopyTo(dstRoi);
             return;
         }
-            
+
         if (dstStep < srcStep && dst.Height < src.Height)
         {
             using var srcRoi = src.Roi(new Rectangle(dx, dy, dst.Width, dst.Height));
@@ -914,7 +914,7 @@ public static class EmguExtensions
 
             if (selectedContours.Size == 0) continue;
             CvInvoke.DrawContours(mask, selectedContours, -1, WhiteColor, -1);
-                
+
         }
         if(drawContours > 0) src.CopyTo(dst, mask);
     }
@@ -1015,7 +1015,7 @@ public static class EmguExtensions
         if (targetSize == mat.Size) return mat.Clone();
         var newMat = InitMat(targetSize);
         using var roiMat = mat.Roi(roi);
-            
+
         //int xStart = mat.Width / 2 - targetSize.Width / 2;
         //int yStart = mat.Height / 2 - targetSize.Height / 2;
         using var newMatRoi = newMat.RoiFromCenter(roi.Size);
@@ -1255,7 +1255,7 @@ public static class EmguExtensions
 
                 x = 0;
             }
-            
+
             // Check for sequence
             var currentGrey = span[i];
             if (thresholdGrey is > byte.MinValue and < byte.MaxValue)
@@ -1288,7 +1288,7 @@ public static class EmguExtensions
                 stride = 1;
                 grey = currentGrey;
             }
-            
+
             x++;
         }
 
@@ -1515,7 +1515,7 @@ public static class EmguExtensions
                         line.Grey = grey;
                         continue;
                     }
-                    
+
                     if (grey == line.Grey) continue;
                     line.EndX = x - 1 + offset.X;
                     lines.Add(line);
@@ -1679,7 +1679,7 @@ public static class EmguExtensions
         {
             newSize = src.Size;
         }
-            
+
         var halfWidth = src.Width / 2.0f;
         var halfHeight = src.Height / 2.0f;
         using var translateTransform = new Matrix<double>(2, 3);
@@ -1746,7 +1746,7 @@ public static class EmguExtensions
     public static void TransformFromCenter(this Mat src, double xScale, double yScale, double xTrans = 0, double yTrans = 0, Size dstSize = default, Inter interpolation = Inter.Linear)
     {
         src.Transform(xScale, yScale,
-            xTrans + (src.Width - src.Width * xScale) / 2.0, 
+            xTrans + (src.Width - src.Width * xScale) / 2.0,
             yTrans + (src.Height - src.Height * yScale) / 2.0, dstSize, interpolation);
     }
 
@@ -1780,10 +1780,10 @@ public static class EmguExtensions
     {
         /*var deltaX = pt2.X - pt1.X;
         var deltaY = pt2.Y - pt1.Y;
-        var deg = Math.Atan2(deltaY, deltaX) * (180 / Math.PI); 
+        var deg = Math.Atan2(deltaY, deltaX) * (180 / Math.PI);
         src.DrawRotatedRectangle(
-            new Size(Math.Abs(deltaX), thickness), 
-            new Point(pt1.X + deltaX / 2, pt1.Y + deltaY / 2), 
+            new Size(Math.Abs(deltaX), thickness),
+            new Point(pt1.X + deltaX / 2, pt1.Y + deltaY / 2),
             color, (int)deg, -1, lineType);*/
 
         if (thickness >= 3)
@@ -1846,7 +1846,7 @@ public static class EmguExtensions
         for (int i = 0; i < vertices.Length; i++)
         {
             points[i] = new(
-                (int)Math.Round(vertices[i].X), 
+                (int)Math.Round(vertices[i].X),
                 (int)Math.Round(vertices[i].Y)
             );
         }
@@ -2118,7 +2118,7 @@ public static class EmguExtensions
     {
         text = text.TrimEnd('\n', '\r', ' ');
         var lines = text.Split(StaticObjects.LineBreakCharacters, StringSplitOptions.None);
-            
+
         switch (lines.Length)
         {
             case 0:
@@ -2156,7 +2156,7 @@ public static class EmguExtensions
         for (var i = 0; i < lines.Length; i++)
         {
             if(string.IsNullOrWhiteSpace(lines[i])) continue;
-                
+
             int x = lineAlignment switch
             {
                 PutTextLineAlignment.None or PutTextLineAlignment.Left => org.X,
@@ -2201,7 +2201,7 @@ public static class EmguExtensions
         org.Offset(sizeDifference.ToPoint());
         org = org.Rotate(-angle, new Point(rotatedSrc.Size.Width / 2, rotatedSrc.Size.Height / 2));
         rotatedSrc.PutTextExtended(text, org, fontFace, fontScale, color, thickness, lineGapOffset, lineType, bottomLeftOrigin, lineAlignment);
-   
+
         using var mask = rotatedSrc.NewZeros();
         mask.PutTextExtended(text, org, fontFace, fontScale, WhiteColor, thickness, lineGapOffset, lineType, bottomLeftOrigin, lineAlignment);
 
@@ -2322,9 +2322,9 @@ public static class EmguExtensions
     {
         var contours = new VectorOfVectorOfPoint();
         using var hierarchyMat = new Mat();
-        
+
         CvInvoke.FindContours(mat, contours, hierarchyMat, mode, method, offset);
-        
+
         hierarchy = new int[hierarchyMat.Cols, 4];
         if (contours.Size == 0) return contours;
         var gcHandle = GCHandle.Alloc(hierarchy, GCHandleType.Pinned);
@@ -2345,7 +2345,7 @@ public static class EmguExtensions
     /// <param name="ksize"></param>
     /// <param name="elementShape"></param>
     /// <param name="cancellationToken"></param>
-    public static Mat Skeletonize(this Mat src, out int iterations, Size ksize = default, ElementShape elementShape = ElementShape.Rectangle, CancellationToken cancellationToken = default)
+    public static Mat Skeletonize(this Mat src, out int iterations, Size ksize = default, MorphShapes elementShape = MorphShapes.Rectangle, CancellationToken cancellationToken = default)
     {
         if (ksize.IsEmpty) ksize = new Size(3, 3);
         var skeleton = src.NewZeros();
@@ -2391,7 +2391,7 @@ public static class EmguExtensions
     /// <param name="ksize"></param>
     /// <param name="elementShape"></param>
     /// <param name="cancellationToken"></param>
-    public static Mat Skeletonize(this Mat src, Size ksize = default, ElementShape elementShape = ElementShape.Rectangle, CancellationToken cancellationToken = default)
+    public static Mat Skeletonize(this Mat src, Size ksize = default, MorphShapes elementShape = MorphShapes.Rectangle, CancellationToken cancellationToken = default)
         => src.Skeletonize(out _, ksize, elementShape, cancellationToken);
     #endregion
 
@@ -2403,7 +2403,7 @@ public static class EmguExtensions
     /// <param name="iterations"></param>
     /// <param name="elementShape"></param>
     /// <returns></returns>
-    public static Mat GetDynamicKernel(ref int iterations, ElementShape elementShape = ElementShape.Ellipse)
+    public static Mat GetDynamicKernel(ref int iterations, MorphShapes elementShape = MorphShapes.Ellipse)
     {
         var size = Math.Max(iterations, 1) * 2 + 1;
         iterations = 1;

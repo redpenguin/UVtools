@@ -525,6 +525,8 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
     ZoomLevelCollection _zoomLevels = ZoomLevelCollection.Default;
     private int _oldZoom = 100;
 
+    private DrawingBrush? _gridBrush;
+
     #endregion
 
     #region Properties
@@ -633,6 +635,8 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
         }
     }
 
+    [MemberNotNullWhen(true, nameof(TrackerImage))]
+    [MemberNotNullWhen(true, nameof(_trackerImage))]
     public bool HaveTrackerImage => _trackerImage is not null;
 
     public static readonly StyledProperty<bool> TrackerImageAutoZoomProperty =
@@ -1522,11 +1526,58 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
             UpdateViewPort();
             TriggerRender();
         }
+        else if (ReferenceEquals(e.Property, GridCellSizeProperty)
+                 || ReferenceEquals(e.Property, GridColorProperty)
+                 || ReferenceEquals(e.Property, GridColorAlternateProperty))
+        {
+            RebuildGridBrush();
+            TriggerRender();
+        }
     }
 
     #endregion
 
+    #region Brushes
+    private void RebuildGridBrush()
+    {
+        _gridBrush = null;
+    }
+
+    private DrawingBrush EnsureGridBrush()
+    {
+        if (_gridBrush != null)
+            return _gridBrush;
+
+        var gridCellSize = Math.Max((byte)1, GridCellSize); // guard
+
+        // Build a 2s x 2s checkerboard tile (top-left and bottom-right = GridColor)
+        var group = new DrawingGroup
+        {
+            Children =
+            {
+                new GeometryDrawing { Brush = GridColor, Geometry = new RectangleGeometry(new Rect(0, 0, gridCellSize, gridCellSize)) },
+                new GeometryDrawing { Brush = GridColorAlternate, Geometry = new RectangleGeometry(new Rect(gridCellSize, 0, gridCellSize, gridCellSize)) },
+                new GeometryDrawing { Brush = GridColorAlternate, Geometry = new RectangleGeometry(new Rect(0, gridCellSize, gridCellSize, gridCellSize)) },
+                new GeometryDrawing { Brush = GridColor, Geometry = new RectangleGeometry(new Rect(gridCellSize, gridCellSize, gridCellSize, gridCellSize)) },
+            }
+        };
+
+        _gridBrush = new DrawingBrush
+        {
+            Drawing = group,
+            Stretch = Stretch.None,
+            TileMode = TileMode.Tile,
+            // DestinationRect in ABSOLUTE units defines the tile size in device-independent px
+            DestinationRect = new RelativeRect(0, 0, 2 * gridCellSize, 2 * gridCellSize, RelativeUnit.Absolute),
+            AlignmentX = AlignmentX.Left,
+            AlignmentY = AlignmentY.Top
+        };
+        return _gridBrush;
+    }
+    #endregion
+
     #region Render methods
+
     public void TriggerRender(bool renderOnlyCursorTracker = false)
     {
         if (!_canRender) return;
@@ -1539,29 +1590,15 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
         //Debug.WriteLine($"Render: {DateTime.Now.Ticks}");
         base.Render(context);
 
-        var viewPortSize = Viewport;
+        var bounds = Bounds;
+        if (bounds.Width <= 0 || bounds.Height <= 0) return;
+
         // Draw Grid
-        var gridCellSize = GridCellSize;
-        if (ShowGrid & gridCellSize > 0 && (!IsHorizontalBarVisible || !IsVerticalBarVisible))
+        if (ShowGrid && GridCellSize > 0)
         {
-            // draw the background
-            var gridColor = GridColor;
-            var altColor = GridColorAlternate;
-            var currentColor = gridColor;
-            for (int y = 0; y < viewPortSize.Height; y += gridCellSize)
-            {
-                var firstRowColor = currentColor;
-
-                for (int x = 0; x < viewPortSize.Width; x += gridCellSize)
-                {
-                    context.FillRectangle(currentColor, new Rect(x, y, gridCellSize, gridCellSize));
-                    currentColor = ReferenceEquals(currentColor, gridColor) ? altColor : gridColor;
-                }
-
-                if (Equals(firstRowColor, currentColor))
-                    currentColor = ReferenceEquals(currentColor, gridColor) ? altColor : gridColor;
-            }
-
+            var brush = EnsureGridBrush();
+            // One call fills everything with the tiled checkerboard
+            context.FillRectangle(brush, new Rect(bounds.Size));
         }
         /*else
         {
@@ -1583,7 +1620,7 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
         if (HaveTrackerImage && _pointerPosition is {X: >= 0, Y: >= 0})
         {
             var destSize = TrackerImageAutoZoom
-                ? new Size(_trackerImage!.Size.Width * zoomFactor, _trackerImage.Size.Height * zoomFactor)
+                ? new Size(_trackerImage.Size.Width * zoomFactor, _trackerImage.Size.Height * zoomFactor)
                 : image.Size;
 
             var destPos = new Point(
@@ -1600,23 +1637,35 @@ public class AdvancedImageBox : TemplatedControl, IScrollable
             var offsetX = Offset.X % zoomFactor;
             var offsetY = Offset.Y % zoomFactor;
 
-            Pen pen = new(PixelGridColor);
-            for (double x = imageViewPort.X + zoomFactor - offsetX; x < imageViewPort.Right; x += zoomFactor)
+            var left = imageViewPort.X;
+            var top = imageViewPort.Y;
+            var right = imageViewPort.Right;
+            var bottom = imageViewPort.Bottom;
+
+            // NOTE: consider caching this pen as a field; creating it every frame allocates.
+            var pixelGridPen = new Pen(PixelGridColor);
+
+            // First vertical line position aligned to zoom steps
+            var startX = left + zoomFactor - offsetX;
+            for (double x = startX; x < right; x += zoomFactor)
             {
-                context.DrawLine(pen, new Point(x, imageViewPort.Y), new Point(x, imageViewPort.Bottom));
+                context.DrawLine(pixelGridPen, new Point(x, top), new Point(x, bottom));
             }
 
-            for (double y = imageViewPort.Y + zoomFactor - offsetY; y < imageViewPort.Bottom; y += zoomFactor)
+            // First horizontal line position aligned to zoom steps
+            var startY = top + zoomFactor - offsetY;
+            for (double y = startY; y < bottom; y += zoomFactor)
             {
-                context.DrawLine(pen, new Point(imageViewPort.X, y), new Point(imageViewPort.Right, y));
+                context.DrawLine(pixelGridPen, new Point(left, y), new Point(right, y));
             }
 
-            context.DrawRectangle(pen, imageViewPort);
+            context.DrawRectangle(pixelGridPen, imageViewPort);
         }
 
-        if (SelectionRegion != default)
+        var selectionRegion = SelectionRegion;
+        if (selectionRegion != default)
         {
-            var rect = GetOffsetRectangle(SelectionRegion);
+            var rect = GetOffsetRectangle(selectionRegion);
             var selectionColor = SelectionColor;
             context.FillRectangle(selectionColor, rect);
             var color = Color.FromArgb(255, selectionColor.Color.R, selectionColor.Color.G, selectionColor.Color.B);

@@ -32,7 +32,7 @@ public partial class TerminalWindow : WindowEx
     private bool _autoScroll = true;
     private bool _verbose = true;
     private bool _clearCommandAfterSend = true;
-        
+
     public ScriptState? _scriptState;
 
     #region Properties
@@ -85,14 +85,14 @@ public partial class TerminalWindow : WindowEx
 
         AddHandler(DragDrop.DropEvent, (sender, e) =>
         {
-            var text = e.Data.GetText();
+            var text = e.DataTransfer.TryGetText();
             if (text is not null)
             {
                 CommandText = text;
                 return;
             }
 
-            var fileNames = e.Data.GetFiles();
+            var fileNames = e.DataTransfer.TryGetFiles();
             if (fileNames is not null)
             {
                 var sb = new StringBuilder();
@@ -110,9 +110,9 @@ public partial class TerminalWindow : WindowEx
                     {
                         Console.WriteLine(exception);
                     }
-                        
+
                 }
-                    
+
                 CommandText = sb.ToString();
             }
         });
@@ -135,7 +135,7 @@ public partial class TerminalWindow : WindowEx
 
         var output = new StringBuilder(_terminalText);
         if (_verbose) output.AppendLine(_commandText);
-            
+
         try
         {
             if (_scriptState is null)
@@ -167,7 +167,7 @@ public partial class TerminalWindow : WindowEx
         {
             output.AppendLine(e.Message);
         }
-            
+
         TerminalText = output.ToString();
 
         if (_clearCommandAfterSend) CommandText = string.Empty;

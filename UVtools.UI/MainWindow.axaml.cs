@@ -794,7 +794,7 @@ public partial class MainWindow : WindowEx
         AddHandler(DragDrop.DropEvent, async (sender, args) =>
         {
             if (!_isGUIEnabled) return;
-            var files = args.Data.GetFiles();
+            var files = args.DataTransfer.TryGetFiles();
             if (files is null) return;
             await ProcessFiles(files.AsValueEnumerable().Select(file => file.TryGetLocalPath()).ToArray()!);
         });
@@ -1201,7 +1201,7 @@ public partial class MainWindow : WindowEx
             }
 
             App._fluentTheme.DensityStyle = Settings.General.ThemeDensity;
-
+            CoreSettings.DefaultLayerCompressionLevel = Settings.General.LayerCompressionLevel;
             if (oldLayerCompressionCodec != Settings.General.LayerCompressionCodec && IsFileLoaded)
             {
                 /*IsGUIEnabled = false;

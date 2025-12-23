@@ -190,7 +190,8 @@ public static class Program
         if (category == "Task")
         {
             if (ex.Message.Contains("org.freedesktop.DBus.Error.ServiceUnknown")
-                || ex.Message.Contains("org.freedesktop.DBus.Error.UnknownMethod")) return;
+                || ex.Message.Contains("org.freedesktop.DBus.Error.UnknownMethod")
+                ) return;
         }
 
         if (!IsCrashReport)

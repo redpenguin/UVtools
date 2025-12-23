@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Xml.Serialization;
@@ -28,19 +27,29 @@ namespace UVtools.Core.Layers;
 
 public enum LayerCompressionCodec : byte
 {
-    [Description("PNG: Compression=High | Speed=Slow (Use with low RAM)")]
+    [Description("PNG: Compression=Medium | Speed=Slow (Use with low RAM)")]
     Png,
-    [Description("GZip: Compression=Medium | Speed=Medium")]
+    [Description("GZip: Compression=Good | Speed=Fast")]
     GZip,
-    [Description("Deflate: Compression=Medium | Speed=Medium")]
+    [Description("Deflate: Compression=Good | Speed=Fast")]
     Deflate,
-    [Description("Brotli: Compression=High | Speed=Fast (Optimal)")]
+    [Description("Brotli: Compression=Good | Speed=Medium (Optimal)")]
     Brotli,
     [Description("LZ4: Compression=Low | Speed=VeryFast (Use with high RAM)")]
     Lz4,
     //[Description("None: Compression=None | Speed=Fastest (Your soul belongs to RAM)")]
     //None
 
+}
+
+public enum LayerCompressionLevel : byte
+{
+    [Description("Lowest: Compression=Low | Speed=Fast (Use with high RAM)")]
+    Lowest,
+    [Description("Optimal: Compression=Medium | Speed=Medium (Optimal)")]
+    Optimal,
+    [Description("Highest: Compression=High | Speed=Slow (Use with low RAM)")]
+    Highest,
 }
 
 #endregion

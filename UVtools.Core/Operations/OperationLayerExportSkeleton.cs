@@ -78,7 +78,7 @@ public sealed class OperationLayerExportSkeleton : Operation
 
     public OperationLayerExportSkeleton(FileFormat slicerFile) : base(slicerFile)
     { }
-        
+
     public override void InitWithSlicerFile()
     {
         _filePath = SlicerFile.FileFullPathNoExt + "_skeleton.png";
@@ -93,21 +93,21 @@ public sealed class OperationLayerExportSkeleton : Operation
         using var skeletonSum = SlicerFile.CreateMat();
         using var skeletonSumRoi = GetRoiOrDefault(skeletonSum);
         using var mask = GetMask(skeletonSum);
-            
+
 
         Parallel.For(LayerIndexStart, LayerIndexEnd+1, CoreSettings.GetParallelOptions(progress), layerIndex =>
         {
             progress.PauseIfRequested();
             using var mat = SlicerFile[layerIndex].LayerMat;
             using var matRoi = GetRoiOrDefault(mat);
-            using var skeletonRoi = matRoi.Skeletonize(new Size(3, 3), ElementShape.Rectangle, progress.Token);
+            using var skeletonRoi = matRoi.Skeletonize(new Size(3, 3), MorphShapes.Rectangle, progress.Token);
             lock (progress.Mutex)
             {
                 CvInvoke.Add(skeletonSumRoi, skeletonRoi, skeletonSumRoi, mask);
                 progress++;
             }
         });
-        
+
         if (_cropByRoi && HaveROI)
         {
             skeletonSumRoi.Save(_filePath);

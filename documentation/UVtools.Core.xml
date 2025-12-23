@@ -136,6 +136,14 @@
             Gets or sets the default compression type for layers
             </summary>
         </member>
+        <member name="P:UVtools.Core.CoreSettings.DefaultLayerCompressionLevel">
+            <summary>
+            Gets or sets the default compression level applied to image layers.
+            </summary>
+            <remarks>This property determines the compression level used when no explicit compression setting is
+            specified for a layer. Changing this value affects subsequent operations that rely on the default compression
+            behavior.</remarks>
+        </member>
         <member name="F:UVtools.Core.CoreSettings.AverageResin1000MlBottleCost">
             <summary>
             <para>The average resin 1000ml bottle cost, to use when bottle cost is not available.</para>
@@ -161,6 +169,25 @@
             <summary>
             Gets the default folder to save the settings
             </summary>
+        </member>
+        <member name="P:UVtools.Core.CoreSettings.LayerCompressionLevel">
+            <summary>
+            Maps the current default layer compression level to the corresponding standard compression level.
+            </summary>
+            <remarks>Use this method to obtain the appropriate <see cref="T:System.IO.Compression.CompressionLevel"/> value based on the
+            application's configured default layer compression. This is useful when interoperating with APIs that require a
+            standard compression level.</remarks>
+            <returns>A value of the <see cref="T:System.IO.Compression.CompressionLevel"/> enumeration that represents the compression level associated with
+            the current default layer setting.</returns>
+        </member>
+        <member name="P:UVtools.Core.CoreSettings.LayerCompressionPngLevel">
+            <summary>
+            Gets the PNG compression level corresponding to the current default layer compression setting.
+            </summary>
+            <remarks>The returned value is suitable for use with PNG encoders that accept a compression level
+            parameter, where higher values typically indicate greater compression at the cost of performance.</remarks>
+            <returns>An integer value representing the PNG compression level. The value is 1 for lowest compression, 3 for optimal
+            compression, and 9 for highest compression. Returns 3 if the default setting is unrecognized.</returns>
         </member>
         <member name="T:UVtools.Core.EmguCV.CMat">
             <summary>
@@ -729,6 +756,11 @@
             <param name="argument"></param>
             <returns></returns>
         </member>
+        <member name="M:UVtools.Core.EmguCV.MatCompressor.CompressToStream(Emgu.CV.Mat,System.IO.Stream,System.Object)">
+            <summary>
+            Writes Mat data to a stream, handling both continuous and non-continuous matrices efficiently.
+            </summary>
+        </member>
         <member name="M:UVtools.Core.EmguCV.MatCompressor.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
             <summary>
             Decompresses the <see cref="T:Emgu.CV.Mat"/> from a byte array.
@@ -739,110 +771,13 @@
         </member>
         <member name="M:UVtools.Core.EmguCV.MatCompressor.CompressAsync(Emgu.CV.Mat,System.Object,System.Threading.CancellationToken)">
             <summary>
-            Compresses the <see cref="T:Emgu.CV.Mat"/> into a byte array.
+            Compresses the <see cref="T:Emgu.CV.Mat"/> into a byte array asynchronously.
             </summary>
-            <param name="src"></param>
-            <param name="argument"></param>
-            <param name="cancellationToken"></param>
-            <returns></returns>
         </member>
         <member name="M:UVtools.Core.EmguCV.MatCompressor.DecompressAsync(System.Byte[],Emgu.CV.Mat,System.Object,System.Threading.CancellationToken)">
             <summary>
-            Decompresses the <see cref="T:Emgu.CV.Mat"/> from a byte array.
+            Decompresses the <see cref="T:Emgu.CV.Mat"/> from a byte array asynchronously.
             </summary>
-            <param name="compressedBytes"></param>
-            <param name="dst"></param>
-            <param name="argument"></param>
-            <param name="cancellationToken"></param>
-            <returns></returns>
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorNone.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorNone"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorNone.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorNone.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorPng.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorPng"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorPng.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorPng.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorPngGreyScale.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorPng"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorPngGreyScale.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorPngGreyScale.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorDeflate.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorDeflate"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorDeflate.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorDeflate.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorGZip.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorGZip"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorGZip.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorGZip.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorZLib.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorZLib"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorZLib.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorZLib.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorBrotli.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorBrotli"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorBrotli.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorBrotli.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="F:UVtools.Core.EmguCV.MatCompressorLz4.Instance">
-            <summary>
-            Instance of <see cref="T:UVtools.Core.EmguCV.MatCompressorLz4"/>.
-            </summary>
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorLz4.Compress(Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:UVtools.Core.EmguCV.MatCompressorLz4.Decompress(System.Byte[],Emgu.CV.Mat,System.Object)">
-            <inheritdoc />
         </member>
         <member name="T:UVtools.Core.EmguCV.MatRoi">
             <summary>
@@ -1948,7 +1883,7 @@
             <param name="offset">Offset, by which every contour point is shifted. This is useful if the contours are extracted from the image ROI and then they should be analyzed in the whole image context</param>
             <returns>Detected contours. Each contour is stored as a vector of points.</returns>
         </member>
-        <member name="M:UVtools.Core.Extensions.EmguExtensions.Skeletonize(Emgu.CV.Mat,System.Int32@,System.Drawing.Size,Emgu.CV.CvEnum.ElementShape,System.Threading.CancellationToken)">
+        <member name="M:UVtools.Core.Extensions.EmguExtensions.Skeletonize(Emgu.CV.Mat,System.Int32@,System.Drawing.Size,Emgu.CV.CvEnum.MorphShapes,System.Threading.CancellationToken)">
             <summary>
             Determine the area (i.e. total number of pixels in the image),
             initialize the output skeletonized image, and construct the
@@ -1960,7 +1895,7 @@
             <param name="elementShape"></param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:UVtools.Core.Extensions.EmguExtensions.Skeletonize(Emgu.CV.Mat,System.Drawing.Size,Emgu.CV.CvEnum.ElementShape,System.Threading.CancellationToken)">
+        <member name="M:UVtools.Core.Extensions.EmguExtensions.Skeletonize(Emgu.CV.Mat,System.Drawing.Size,Emgu.CV.CvEnum.MorphShapes,System.Threading.CancellationToken)">
             <summary>
             Determine the area (i.e. total number of pixels in the image),
             initialize the output skeletonized image, and construct the
@@ -1971,7 +1906,7 @@
             <param name="elementShape"></param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:UVtools.Core.Extensions.EmguExtensions.GetDynamicKernel(System.Int32@,Emgu.CV.CvEnum.ElementShape)">
+        <member name="M:UVtools.Core.Extensions.EmguExtensions.GetDynamicKernel(System.Int32@,Emgu.CV.CvEnum.MorphShapes)">
             <summary>
             Reduces iterations to 1 and generate a kernel to match the iterations effect
             </summary>
@@ -2180,10 +2115,15 @@
             <returns></returns>
         </member>
         <member name="M:UVtools.Core.Extensions.StreamExtensions.ToArray(System.IO.Stream)">
+            <inheritdoc cref="M:UVtools.Core.Extensions.StreamExtensions.&lt;G&gt;$50F26341F4F164F9281EDEBBEB746904.ToArray"/>
+        </member>
+        <member name="T:UVtools.Core.Extensions.StreamExtensions.&lt;G&gt;$50F26341F4F164F9281EDEBBEB746904.&lt;M&gt;$05FA4CA844D6F809592CA75BE4C36206">
+            <param name="stream">Input</param>
+        </member>
+        <member name="M:UVtools.Core.Extensions.StreamExtensions.&lt;G&gt;$50F26341F4F164F9281EDEBBEB746904.ToArray">
             <summary>
             Converts stream into byte array
             </summary>
-            <param name="stream">Input</param>
             <returns>Byte array data</returns>
         </member>
         <member name="M:UVtools.Core.Extensions.StringExtensions.FirstCharToUpper(System.String)">
